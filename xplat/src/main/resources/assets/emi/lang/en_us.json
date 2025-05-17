@@ -8,6 +8,7 @@
   "key.emi.clear_search": "Clear Search",
   "key.emi.display_all_recipes": "Display All Recipes",
 
+  "key.emi.add_bookmark": "Add Search Bookmark",
   "key.emi.view_recipes": "View Recipes",
   "key.emi.view_uses": "View Uses",
   "key.emi.favorite": "Favorite",
@@ -54,6 +55,7 @@
   "emi.sidebar.type.craftables.description": "Displays all craftable stacks",
   "emi.sidebar.type.favorites": "Favorites",
   "emi.sidebar.type.favorites.description": "Displays favorites",
+  "emi.sidebar.type.bookmarks": "Search Bookmarks",
   "emi.sidebar.type.lookup_history": "Lookup History",
   "emi.sidebar.type.lookup_history.description": "Displays previously looked up stacks",
   "emi.sidebar.type.craft_history": "Crafting History",

@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import dev.emi.emi.api.stack.SearchEmiIngredient;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
@@ -52,6 +53,7 @@ import dev.emi.emi.registry.EmiExclusionAreas;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiStackProviders;
+import dev.emi.emi.runtime.EmiBookmarks;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiFavorite;
 import dev.emi.emi.runtime.EmiFavorites;
@@ -1064,6 +1066,21 @@ public class EmiScreenManager {
 					}
 				} else {
 					EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button));
+
+					if (panel != null) {
+						ScreenSpace space = panel.getHoveredSpace(mx, my);
+						if (space != null && space.getType() == SidebarType.BOOKMARKS && pressedStack instanceof SearchEmiIngredient bookmark) {
+							if (button == 1) {
+								EmiBookmarks.removeBookmark(bookmark);
+							} else if (bookmark.getContent() != null) {
+								EmiApi.setSearchText(bookmark.getContent());
+								EmiPort.focus(search, true);
+							}
+
+							return true;
+						}
+					}
+
 					if (draggedStack.isEmpty() && stackInteraction(hovered, bind -> bind.matchesMouse(button))) {
 						return true;
 					}
