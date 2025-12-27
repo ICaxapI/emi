@@ -100,8 +100,9 @@ public class TreeBookmarkNameScreen extends Screen {
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 		renderBackground(context);
-		context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, this.height / 2 - 32, 0xFFFFFF);
-		nameField.render(context, mouseX, mouseY, delta);
 		super.render(context, mouseX, mouseY, delta);
+		nameField.render(context, mouseX, mouseY, delta);
+		context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, this.height / 2 - 32, 0xFFFFFF);
+		nameField.setFocused(true);
 	}
 }
