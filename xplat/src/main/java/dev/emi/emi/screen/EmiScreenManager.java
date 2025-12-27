@@ -1088,6 +1088,7 @@ public class EmiScreenManager {
   							EmiTreeBookmarks.removeBookmark(treeBookmark);
   						} else {
   							EmiTreeBookmarks.apply(treeBookmark);
+							EmiApi.viewRecipeTree();
   						}
   						return true;
   					}
@@ -1264,7 +1265,7 @@ public class EmiScreenManager {
 			} else if (function.apply(EmiConfig.viewUses)) {
 				EmiApi.displayUses(ingredient);
 				return true;
-			} else if (function.apply(EmiConfig.favorite)) {
+			} else if (function.apply(EmiConfig.favorite) && !(ingredient instanceof SearchEmiIngredient)) {
 				EmiFavorites.addFavorite(ingredient, stack.getRecipeContext());
 				repopulatePanels(SidebarType.FAVORITES);
 				return true;
