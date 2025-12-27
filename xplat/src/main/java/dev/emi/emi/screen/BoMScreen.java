@@ -1,5 +1,6 @@
 package dev.emi.emi.screen;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -41,9 +42,11 @@ import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiFavorites;
 import dev.emi.emi.runtime.EmiHistory;
+import dev.emi.emi.runtime.EmiTreeBookmarks;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.EmiTooltip;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
+import dev.emi.emi.screen.TreeBookmarkNameScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -412,7 +415,7 @@ public class BoMScreen extends Screen {
 			List<TooltipComponent> list = EmiTooltip.splitTranslate(key, tree.batches);
 			EmiRenderHelper.drawTooltip(this, context, list, mouseX, mouseY);
 		} else if (help.contains(mouseX, mouseY)) {
-			List<TooltipComponent> list =  EmiTooltip.splitTranslate("tooltip.emi.bom.help");
+			List<TooltipComponent> list = Collections.singletonList(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.bom.help", EmiConfig.addTreeBookmark.getBindText()))));
 			EmiRenderHelper.drawTooltip(this, context, list, width - 18, height - 18, width);
 		}
 	}
@@ -550,6 +553,12 @@ public class BoMScreen extends Screen {
 			init();
 		}
 
+		if (EmiConfig.addTreeBookmark.matchesKey(keyCode, scanCode)) {
+			String suggested = EmiTreeBookmarks.suggestName(BoM.getTrees(), BoM.treeIndex, BoM.craftingMode);
+			MinecraftClient.getInstance().setScreen(new TreeBookmarkNameScreen(this, suggested, name ->
+				EmiTreeBookmarks.addBookmark(BoM.getTrees(), BoM.treeIndex, BoM.craftingMode, name)));
+			return true;
+		}
 		if (EmiInput.isAltDown() != altDown) {
 			altDown = EmiInput.isAltDown();
 			recalculateTree();
