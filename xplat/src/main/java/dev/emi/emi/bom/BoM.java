@@ -238,6 +238,12 @@ public class BoM {
 		}
 	}
 
+	public static void addResolutionAllTrees(EmiIngredient ingredient, EmiRecipe recipe) {
+		for (MaterialTree tree : trees) {
+			tree.addResolution(ingredient, recipe);
+		}
+	}
+
 	public static boolean isDefaultRecipe(EmiIngredient stack, EmiRecipe recipe) {
 		if (recipe instanceof EmiResolutionRecipe err) {
 			if (getRecipe(err.ingredient) instanceof EmiResolutionRecipe res) {

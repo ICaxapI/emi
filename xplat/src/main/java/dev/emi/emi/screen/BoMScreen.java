@@ -681,7 +681,11 @@ public class BoMScreen extends Screen {
 			}
 			if (hover.stack != null) {
 				if (EmiInput.isShiftDown() && button == 0) {
-					if (getAutoResolutions(hover, BoM::addResolution)) {
+					BiConsumer<EmiIngredient, EmiRecipe> resolutionAdder = BoM::addResolution;
+					if (hover.node == null) {
+						resolutionAdder = BoM::addResolutionAllTrees;
+					}
+					if (getAutoResolutions(hover, resolutionAdder)) {
 						recalculateTree();
 					}
 					return true;
@@ -689,6 +693,7 @@ public class BoMScreen extends Screen {
 					if (button == 0) {
 						EmiApi.displayRecipes(hover.stack);
 						RecipeScreen.resolve = hover.stack;
+						RecipeScreen.resolveAllTrees = hover.node == null;
 						MinecraftClient client = MinecraftClient.getInstance();
 						// The first init doesn't realize a resolution exists so we do it again. What
 						// could go wrong.
