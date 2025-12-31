@@ -143,6 +143,14 @@ public class EmiConfig {
 	@ConfigValue("ui.recipe-tree-button-visibility")
 	public static ButtonVisibility recipeTreeButtonVisibility = ButtonVisibility.AUTO;
 
+	@Comment("Grid size for recipe tree roots")
+	@ConfigValue("ui.recipe-tree-root-grid-size")
+	public static IntGroup recipeTreeRootGridSize = new IntGroup(
+			"emi.recipe_tree.root_grid.size.",
+			List.of("columns", "rows"),
+			IntList.of(8, 2)
+	);
+
 	@ConfigGroup("ui.recipe-screen")
 	@Comment("The maximum height the recipe screen will grow to be if space is available in pixels.")
 	@ConfigValue("ui.maximum-recipe-screen-height")
@@ -166,7 +174,7 @@ public class EmiConfig {
 	@ConfigValue("ui.workstation-location")
 	public static SidebarSide workstationLocation = SidebarSide.BOTTOM;
 
-	@ConfigGroupEnd()
+	@ConfigGroupEnd
 	@Comment("Display cost per batch when hovering a recipe output")
 	@ConfigValue("ui.show-cost-per-batch")
 	public static boolean showCostPerBatch = true;
