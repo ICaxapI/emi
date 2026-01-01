@@ -208,16 +208,7 @@ public class BoM {
 		treeIndex = Math.max(0, Math.min(index, trees.size() - 1));
 	}
 
-   	public static void cycleTree(int delta) {
-		if (trees.isEmpty()) {
-			treeIndex = -1;
-			return;
-		}
-		int size = trees.size();
-		treeIndex = ((treeIndex + delta) % size + size) % size;
-	}
-
-   	public static void removeTree(int index) {
+	public static void removeTree(int index) {
 		if (index < 0 || index >= trees.size()) {
 			return;
 		}
@@ -232,14 +223,19 @@ public class BoM {
 	}
 
 	public static void addResolution(EmiIngredient ingredient, EmiRecipe recipe) {
-		MaterialTree tree = getTree();
-		if (tree != null) {
-			tree.addResolution(ingredient, recipe);
-		}
+		addResolution(ingredient, recipe, false);
 	}
 
-	public static void addResolutionAllTrees(EmiIngredient ingredient, EmiRecipe recipe) {
-		for (MaterialTree tree : trees) {
+	public static void addResolution(EmiIngredient ingredient, EmiRecipe recipe, boolean allTrees) {
+		if (allTrees) {
+			List<MaterialTree> trees = getTrees();
+			for (MaterialTree tree : trees) {
+				tree.addResolution(ingredient, recipe);
+			}
+			return;
+		}
+		MaterialTree tree = getTree();
+		if (tree != null) {
 			tree.addResolution(ingredient, recipe);
 		}
 	}

@@ -291,11 +291,7 @@ public class SlotWidget extends Widget {
 				EmiHistory.pop();
 				return true;
 			} else if (function.apply(EmiConfig.viewRecipes)) {
-				if (RecipeScreen.resolveAllTrees) {
-					BoM.addResolutionAllTrees(RecipeScreen.resolve, recipe);
-				} else {
-					BoM.addResolution(RecipeScreen.resolve, recipe);
-				}
+				BoM.addResolution(RecipeScreen.resolve, recipe, RecipeScreen.resolveAllTrees);
 				EmiHistory.pop();
 				return true;
 			}

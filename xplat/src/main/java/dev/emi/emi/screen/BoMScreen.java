@@ -99,12 +99,8 @@ public class BoMScreen extends Screen {
 	}
 
 	public void init() {
-		if (BoM.getTree() != null) {
-			offY = 0;
-		} else {
-			offY = 0;
-		}
-		recalculateTree();
+        offY = 0;
+        recalculateTree();
 	}
 
 	public void recalculateTree() {
@@ -218,8 +214,8 @@ public class BoMScreen extends Screen {
 		rootPage = Math.max(0, Math.min(rootPage, Math.max(0, rootPageCount - 1)));
 		int startIndex = rootPage * pageSize;
 		int visible = Math.min(pageSize, Math.max(0, roots.size() - startIndex));
-		int rowWidth = rootCols > 0 ? ((rootCols - 1) * 20 + 16) : 0;
-		int gridHeight = rootRows > 0 ? ((rootRows - 1) * NODE_VERTICAL_SPACING + 16) : 0;
+		int rowWidth = (rootCols - 1) * 20 + 16;
+		int gridHeight = (rootRows - 1) * NODE_VERTICAL_SPACING + 16;
 		int startX = rowWidth > 0 ? -((rootCols - 1) * 20) / 2 : 0;
 		int rootY = -NODE_VERTICAL_SPACING / 2 - gridHeight;
 		int rootCenterY = rootY + ((rootRows - 1) * NODE_VERTICAL_SPACING) / 2;
@@ -681,19 +677,16 @@ public class BoMScreen extends Screen {
 			}
 			if (hover.stack != null) {
 				if (EmiInput.isShiftDown() && button == 0) {
-					BiConsumer<EmiIngredient, EmiRecipe> resolutionAdder = BoM::addResolution;
-					if (hover.node == null) {
-						resolutionAdder = BoM::addResolutionAllTrees;
-					}
-					if (getAutoResolutions(hover, resolutionAdder)) {
+					boolean allTrees = hover.node == null;
+					if (getAutoResolutions(hover, (ingredient, recipe) ->
+							BoM.addResolution(ingredient, recipe, allTrees))) {
 						recalculateTree();
 					}
 					return true;
 				} else {
 					if (button == 0) {
 						EmiApi.displayRecipes(hover.stack);
-						RecipeScreen.resolve = hover.stack;
-						RecipeScreen.resolveAllTrees = hover.node == null;
+						RecipeScreen.setResolve(hover.stack, hover.node == null);
 						MinecraftClient client = MinecraftClient.getInstance();
 						// The first init doesn't realize a resolution exists so we do it again. What
 						// could go wrong.

@@ -81,9 +81,18 @@ public class RecipeScreen extends Screen {
 			new SizedButtonWidget(x + backgroundWidth - 17, y + 18, 12, 12, 12, 0,
 				() -> tabs.get(tab).getPageCount() > 1, w -> setPage(tabPage, tab, page + 1))
 		);
+		clearResolve();
+		this.recipes = recipes;
+	}
+
+	public static void setResolve(EmiIngredient stack, boolean allTrees) {
+		resolve = stack;
+		resolveAllTrees = allTrees;
+	}
+
+	public static void clearResolve() {
 		resolve = null;
 		resolveAllTrees = false;
-		this.recipes = recipes;
 	}
 
 	@Override
