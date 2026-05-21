@@ -46,6 +46,7 @@ import net.minecraft.util.Identifier;
 public class RecipeScreen extends Screen {
 	private static final Identifier TEXTURE = EmiPort.id("emi", "textures/gui/background.png");
 	public static @Nullable EmiIngredient resolve = null;
+	public static boolean resolveAllTrees = false;
 	private Map<EmiRecipeCategory, List<EmiRecipe>> recipes;
 	public HandledScreen<?> old;
 	private List<RecipeTab> tabs = Lists.newArrayList();
@@ -80,8 +81,18 @@ public class RecipeScreen extends Screen {
 			new SizedButtonWidget(x + backgroundWidth - 17, y + 18, 12, 12, 12, 0,
 				() -> tabs.get(tab).getPageCount() > 1, w -> setPage(tabPage, tab, page + 1))
 		);
-		resolve = null;
+		clearResolve();
 		this.recipes = recipes;
+	}
+
+	public static void setResolve(EmiIngredient stack, boolean allTrees) {
+		resolve = stack;
+		resolveAllTrees = allTrees;
+	}
+
+	public static void clearResolve() {
+		resolve = null;
+		resolveAllTrees = false;
 	}
 
 	@Override
