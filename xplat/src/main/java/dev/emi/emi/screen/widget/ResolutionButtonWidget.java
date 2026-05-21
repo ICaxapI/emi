@@ -12,6 +12,7 @@ import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiHistory;
+import dev.emi.emi.screen.RecipeScreen;
 import dev.emi.emi.widget.RecipeDefaultButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -24,7 +25,7 @@ public class ResolutionButtonWidget extends ButtonWidget {
 	public ResolutionButtonWidget(int x, int y, int width, int height, EmiIngredient stack, Supplier<Widget> hoveredWidget) {
 		super(x, y, width, height, EmiPort.literal(""), button -> {
 			if (BoM.getTree() != null) {
-				BoM.addResolution(stack, null);
+				BoM.addResolution(stack, null, RecipeScreen.resolveAllTrees);
 				EmiHistory.pop();
 			}
 		}, s -> s.get());

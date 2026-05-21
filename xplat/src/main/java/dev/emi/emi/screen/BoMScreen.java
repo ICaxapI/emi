@@ -71,7 +71,7 @@ public class BoMScreen extends Screen {
 	private List<Node> nodes = Lists.newArrayList();
 	private List<Cost> costs = Lists.newArrayList();
 	private EmiPlayerInventory playerInv;
-	private boolean hasRemainders = false;;
+	private boolean hasRemainders = false;
 	public HandledScreen<?> old;
 	private int nodeWidth = 0;
 	private int nodeHeight = 0;
@@ -83,7 +83,9 @@ public class BoMScreen extends Screen {
 	private List<Bounds> rootSlots = Lists.newArrayList();
 	private List<Integer> rootIndices = Lists.newArrayList();
 	private List<Long> rootAmounts = Lists.newArrayList();
-	private int rootScroll = 0;
+	private int rootPage = 0;
+	private int rootPageCount = 0;
+	private int rootGridCenterX = 0;
 	private boolean initialViewSet = false;
 	private boolean altDown = false;
 
@@ -93,12 +95,8 @@ public class BoMScreen extends Screen {
 	}
 
 	public void init() {
-		if (BoM.getTree() != null) {
-			offY = 0;
-		} else {
-			offY = 0;
-		}
-		recalculateTree();
+        offY = 0;
+        recalculateTree();
 	}
 
 	public void recalculateTree() {
@@ -205,27 +203,29 @@ public class BoMScreen extends Screen {
 			hasRemainders = false;
 		}
 
-		int rootY = -NODE_VERTICAL_SPACING * 3;
-		int maxVisible = 7;
-		rootScroll = Math.max(0, Math.min(rootScroll, Math.max(0, roots.size() - maxVisible)));
-		if (BoM.treeIndex >= 0) {
-			if (BoM.treeIndex < rootScroll) {
-				rootScroll = BoM.treeIndex;
-			}
-			if (BoM.treeIndex >= rootScroll + maxVisible) {
-				rootScroll = BoM.treeIndex - maxVisible + 1;
-			}
-		}
-		int visible = Math.min(maxVisible, roots.size());
-		int rowWidth = visible > 0 ? ((visible - 1) * 20 + 16) : 0;
-		int startX = visible > 0 ? -((visible - 1) * 20) / 2 : 0;
-		rootLeft = new Bounds(startX - 20, rootY - 4, 12, 12);
-		rootRight = new Bounds(startX + rowWidth - 8, rootY - 4, 12, 12);
-		rootArea = new Bounds(startX - 24, rootY - 12, rowWidth + 48, 24);
+		int rootCols = Math.max(1, EmiConfig.recipeTreeRootGridSize.values.getInt(0));
+		int rootRows = Math.max(1, EmiConfig.recipeTreeRootGridSize.values.getInt(1));
+		int pageSize = rootCols * rootRows;
+		rootPageCount = roots.isEmpty() ? 0 : ((roots.size() - 1) / pageSize + 1);
+		rootPage = Math.max(0, Math.min(rootPage, Math.max(0, rootPageCount - 1)));
+		int startIndex = rootPage * pageSize;
+		int visible = Math.min(pageSize, Math.max(0, roots.size() - startIndex));
+		int rowWidth = (rootCols - 1) * 20 + 16;
+		int gridHeight = (rootRows - 1) * NODE_VERTICAL_SPACING + 16;
+		int startX = rowWidth > 0 ? -((rootCols - 1) * 20) / 2 : 0;
+		int rootY = -NODE_VERTICAL_SPACING / 2 - gridHeight;
+		int rootCenterY = rootY + ((rootRows - 1) * NODE_VERTICAL_SPACING) / 2;
+		rootLeft = new Bounds(startX - 20, rootCenterY - 6, 12, 12);
+		rootRight = new Bounds(startX + rowWidth - 8, rootCenterY - 6, 12, 12);
+		rootArea = new Bounds(startX - 24, rootY - 12, rowWidth + 48, gridHeight + 24);
+		rootGridCenterX = startX + rowWidth / 2;
 		for (int i = 0; i < visible; i++) {
-			int index = i + rootScroll;
-			int x = startX + i * 20;
-			rootSlots.add(new Bounds(x - 8, rootY - 8, 16, 16));
+			int index = startIndex + i;
+			int col = i % rootCols;
+			int row = i / rootCols;
+			int x = startX + col * 20;
+			int y = rootY + row * NODE_VERTICAL_SPACING;
+			rootSlots.add(new Bounds(x - 8, y - 8, 16, 16));
 			rootIndices.add(index);
 			rootAmounts.add(getRootAmount(roots.get(index)));
 		}
@@ -320,9 +320,10 @@ public class BoMScreen extends Screen {
 				Bounds slot = rootSlots.get(i);
 				int index = rootIndices.get(i);
 				MaterialTree rootTree = roots.get(index);
-				Bounds del = new Bounds(slot.x(), slot.y() - 10, slot.width(), 8);
+				Bounds del = new Bounds(slot.right() - slot.width() / 4, slot.top(), 4, 4);
 				boolean hoveredSlot = slot.contains(mx, my);
 				boolean hoveredDelete = del.contains(mx, my);
+				boolean showDelete = hoveredSlot || hoveredDelete;
 				boolean selected = index == BoM.treeIndex;
 				int border = selected ? 0xff8099ff : 0xffffffff;
 				if (!selected && hoveredSlot) {
@@ -343,22 +344,34 @@ public class BoMScreen extends Screen {
 					EmiRenderHelper.renderAmount(context, slot.x(), slot.y(),
 							EmiRenderHelper.getAmountText(rootTree.goal.ingredient, rootAmounts.get(i)));
 				}
-				if (hoveredSlot || hoveredDelete) {
+				if (showDelete) {
+					int del_border = hoveredDelete ? 0xffff0000 : 0xff882222;
+					context.push();
+					context.matrices().translate(0, 0, 200);
 					context.fill(del.x(), del.y(), del.width(), del.height(), 0x88ff0000);
-					context.drawCenteredText(EmiPort.literal("X"), del.x() + del.width() / 2, del.y() + 1);
+					context.fill(del.left() - 1, del.top() - 1, del.width() + 2, 1, del_border);
+					context.fill(del.left() - 1, del.top() - 1, 1, del.height() + 2, del_border);
+					context.fill(del.left() - 1, del.bottom(), del.width() + 2, 1, del_border);
+					context.fill(del.right(), del.top() - 1, 1, del.height() + 2, del_border);
+					context.drawTexture(EmiRenderHelper.WIDGETS, del.x(), del.y(), 0, 252 , del.width(), del.height());
+					context.pop();
 				}
 			}
-			if (roots.size() > rootSlots.size()) {
+
+			if (rootPageCount > 1) {
+				int arrowY = rootLeft.y() + (rootLeft.height() - textRenderer.fontHeight) / 2;
 				if (rootLeft.contains(mx, my)) {
 					context.setColor(0.5f, 0.6f, 1f, 1f);
 				}
-				context.drawCenteredText(EmiPort.literal("<"), rootLeft.x() + rootLeft.width() / 2, rootLeft.y());
+				context.drawCenteredTextWithShadow(EmiPort.literal("<"), rootLeft.x() + rootLeft.width() / 2, arrowY);
 				context.setColor(1f, 1f, 1f, 1f);
 				if (rootRight.contains(mx, my)) {
 					context.setColor(0.5f, 0.6f, 1f, 1f);
 				}
-				context.drawCenteredText(EmiPort.literal(">"), rootRight.x() + rootRight.width() / 2, rootRight.y());
+				context.drawCenteredTextWithShadow(EmiPort.literal(">"), rootRight.x() + rootRight.width() / 2, arrowY);
 				context.setColor(1f, 1f, 1f, 1f);
+
+				context.drawCenteredText(EmiPort.translatable("emi.root_grid_page", rootPage + 1), rootGridCenterX, rootArea.y() - NODE_VERTICAL_SPACING);
 			}
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
 			context.drawCenteredText(EmiPort.translatable("emi.total_cost"), 0, cy - 16);
@@ -613,28 +626,34 @@ public class BoMScreen extends Screen {
 		int my = (int) ((mouseY - height / 2) / scale - offY);
 		MaterialTree tree = BoM.getTree();
 		List<MaterialTree> roots = BoM.getTrees();
+		if (rootPageCount > 1) {
+			if (rootLeft.contains(mx, my)) {
+				rootPage = (rootPage - 1 + rootPageCount) % rootPageCount;
+				recalculateTree();
+				return true;
+			} else if (rootRight.contains(mx, my)) {
+				rootPage = (rootPage + 1) % rootPageCount;
+				recalculateTree();
+				return true;
+			}
+		}
 		for (int i = 0; i < rootSlots.size(); i++) {
 			Bounds slot = rootSlots.get(i);
 			int index = rootIndices.get(i);
-			Bounds del = new Bounds(slot.x(), slot.y() - 10, slot.width(), 8);
+			Bounds del = new Bounds(slot.right() - slot.width() / 4, slot.top(), 4, 4);
 			if (del.contains(mx, my)) {
 				BoM.removeTree(index);
 				recalculateTree();
 				return true;
 			}
 			if (slot.contains(mx, my)) {
+				int rootCols = Math.max(1, EmiConfig.recipeTreeRootGridSize.values.getInt(0));
+				int rootRows = Math.max(1, EmiConfig.recipeTreeRootGridSize.values.getInt(1));
+				int pageSize = rootCols * rootRows;
+				if (pageSize > 0) {
+					rootPage = index / pageSize;
+				}
 				BoM.selectTree(index);
-				recalculateTree();
-				return true;
-			}
-		}
-		if (roots.size() > rootSlots.size()) {
-			if (rootLeft.contains(mx, my)) {
-				BoM.cycleTree(-1);
-				recalculateTree();
-				return true;
-			} else if (rootRight.contains(mx, my)) {
-				BoM.cycleTree(1);
 				recalculateTree();
 				return true;
 			}
@@ -655,14 +674,16 @@ public class BoMScreen extends Screen {
 			}
 			if (hover.stack != null) {
 				if (EmiInput.isShiftDown() && button == 0) {
-					if (getAutoResolutions(hover, BoM::addResolution)) {
+					boolean allTrees = hover.node == null;
+					if (getAutoResolutions(hover, (ingredient, recipe) ->
+							BoM.addResolution(ingredient, recipe, allTrees))) {
 						recalculateTree();
 					}
 					return true;
 				} else {
 					if (button == 0) {
 						EmiApi.displayRecipes(hover.stack);
-						RecipeScreen.resolve = hover.stack;
+						RecipeScreen.setResolve(hover.stack, hover.node == null);
 						MinecraftClient client = MinecraftClient.getInstance();
 						// The first init doesn't realize a resolution exists so we do it again. What
 						// could go wrong.
@@ -706,11 +727,6 @@ public class BoMScreen extends Screen {
 		int my = (int) ((mouseY - height / 2) / scale - offY);
 		MaterialTree tree = BoM.getTree();
 		List<MaterialTree> roots = BoM.getTrees();
-		if (!roots.isEmpty() && rootArea.contains(mx, my) && amount != 0) {
-			BoM.cycleTree(-(int) amount);
-			recalculateTree();
-			return true;
-		}
 		if (tree != null && batches.contains(mx, my)) {
 			long scroll = (long) amount;
 			List<MaterialTree> targets = EmiInput.isAltDown() ? roots : List.of(tree);
