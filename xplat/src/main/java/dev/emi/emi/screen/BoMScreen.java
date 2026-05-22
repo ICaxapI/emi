@@ -42,11 +42,9 @@ import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiFavorites;
 import dev.emi.emi.runtime.EmiHistory;
-import dev.emi.emi.runtime.EmiTreeBookmarks;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.EmiTooltip;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
-import dev.emi.emi.screen.TreeBookmarkNameScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -576,10 +574,9 @@ public class BoMScreen extends Screen {
 		}
 
 		if (EmiConfig.addTreeBookmark.matchesKey(keyCode, scanCode)) {
-			String suggested = EmiTreeBookmarks.suggestName(BoM.getTrees(), BoM.treeIndex, BoM.craftingMode);
-			MinecraftClient.getInstance().setScreen(new TreeBookmarkNameScreen(this, suggested, name ->
-				EmiTreeBookmarks.addBookmark(BoM.getTrees(), BoM.treeIndex, BoM.craftingMode, name)));
-			return true;
+			if (TreeBookmarkNameScreen.openCurrentTreeBookmark(this)) {
+				return true;
+			}
 		}
 		if (EmiInput.isAltDown() != altDown) {
 			altDown = EmiInput.isAltDown();

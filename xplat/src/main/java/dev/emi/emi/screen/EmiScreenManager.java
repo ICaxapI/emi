@@ -1145,6 +1145,11 @@ public class EmiScreenManager {
 		if (hasFocusedTextField(client.currentScreen, 10)) {
 			return false;
 		}
+		if (EmiConfig.addTreeBookmark.matchesKey(keyCode, scanCode)) {
+			if (TreeBookmarkNameScreen.openCurrentTreeBookmark(client.currentScreen)) {
+				return true;
+			}
+		}
 		if (EmiConfig.cheatMode && EmiConfig.deleteCursorStack.matchesKey(keyCode, scanCode)) {
 			if (deleteCursor(lastMouseX, lastMouseY)) {
 				return true;

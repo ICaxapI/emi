@@ -1,10 +1,14 @@
 package dev.emi.emi.screen;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.lwjgl.glfw.GLFW;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.bom.BoM;
+import dev.emi.emi.bom.MaterialTree;
+import dev.emi.emi.runtime.EmiTreeBookmarks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -24,6 +28,20 @@ public class TreeBookmarkNameScreen extends Screen {
 		this.parent = parent;
 		this.initialName = initialName == null ? "" : initialName;
 		this.onSave = onSave;
+	}
+
+	static boolean canBookmarkTrees(List<MaterialTree> trees) {
+		return trees != null && !trees.isEmpty();
+	}
+
+	static boolean openCurrentTreeBookmark(Screen parent) {
+		if (!canBookmarkTrees(BoM.getTrees())) {
+			return false;
+		}
+		String suggested = EmiTreeBookmarks.suggestName(BoM.getTrees(), BoM.treeIndex, BoM.craftingMode);
+		MinecraftClient.getInstance().setScreen(new TreeBookmarkNameScreen(parent, suggested, name ->
+			EmiTreeBookmarks.addBookmark(BoM.getTrees(), BoM.treeIndex, BoM.craftingMode, name)));
+		return true;
 	}
 
 	@Override
