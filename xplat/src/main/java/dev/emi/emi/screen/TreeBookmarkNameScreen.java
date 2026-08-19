@@ -52,7 +52,7 @@ public class TreeBookmarkNameScreen extends Screen {
 		nameField.setMaxLength(128);
 		nameField.setText(initialName);
 		nameField.setFocused(true);
-		nameField.setCursorToEnd();
+		nameField.setCursorToEnd(false);
 		addSelectableChild(nameField);
 
 		int buttonWidth = 98;
@@ -75,7 +75,6 @@ public class TreeBookmarkNameScreen extends Screen {
 	public void tick() {
 		super.tick();
 		if (nameField != null) {
-			nameField.tick();
 			updateButtonState();
 		}
 	}
@@ -117,7 +116,7 @@ public class TreeBookmarkNameScreen extends Screen {
 
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-		renderBackground(context);
+		renderBackground(context, mouseX, mouseY, delta);
 		super.render(context, mouseX, mouseY, delta);
 		nameField.render(context, mouseX, mouseY, delta);
 		context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, this.height / 2 - 32, 0xFFFFFF);

@@ -64,6 +64,7 @@ import dev.emi.emi.runtime.EmiProfiler;
 import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.emi.runtime.EmiReloadManager;
 import dev.emi.emi.runtime.EmiSidebars;
+import dev.emi.emi.runtime.EmiTreeBookmarks;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import dev.emi.emi.screen.widget.EmiSearchWidget;
 import dev.emi.emi.screen.widget.SidebarButtonWidget;

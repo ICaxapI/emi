@@ -530,7 +530,7 @@ public class EmiTreeBookmarks {
 
 		public void apply(Map<EmiIngredient, EmiRecipe> map) {
 			EmiRecipe recipe = null;
-			if (recipeId != null && Identifier.isValid(recipeId)) {
+			if (recipeId != null && Identifier.tryParse(recipeId) != null) {
 				recipe = EmiApi.getRecipeManager().getRecipe(EmiPort.id(recipeId));
 			} else if (!stack.isEmpty()) {
 				recipe = new EmiResolutionRecipe(ingredient, stack);
@@ -680,7 +680,7 @@ public class EmiTreeBookmarks {
 		}
 
 		private EmiRecipe recipeFromId() {
-			if (recipeId == null || !Identifier.isValid(recipeId)) {
+			if (recipeId == null || Identifier.tryParse(recipeId) == null) {
 				return null;
 			}
 			return EmiApi.getRecipeManager().getRecipe(EmiPort.id(recipeId));
