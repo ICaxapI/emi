@@ -1,6 +1,5 @@
 package dev.emi.emi.platform.neoforge;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.network.CommandS2CPacket;
 import dev.emi.emi.network.CreateItemC2SPacket;
 import dev.emi.emi.network.EmiChessPacket;
@@ -12,12 +11,13 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketDecoder;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Identifier;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class EmiPacketHandler {
-    private static final CustomPayload.Id<EmiChessPacket.S2C> ID_CHESS_CLIENTBOUND = new CustomPayload.Id<EmiChessPacket.S2C>(EmiPort.id("emi:chess_s2c"));
-    private static final CustomPayload.Id<EmiChessPacket.C2S> ID_CHESS_SERVERBOUND = new CustomPayload.Id<EmiChessPacket.C2S>(EmiPort.id("emi:chess_c2s"));
+    private static final CustomPayload.Id<EmiChessPacket.S2C> ID_CHESS_CLIENTBOUND = new CustomPayload.Id<EmiChessPacket.S2C>(Identifier.of("emi:chess_s2c"));
+    private static final CustomPayload.Id<EmiChessPacket.C2S> ID_CHESS_SERVERBOUND = new CustomPayload.Id<EmiChessPacket.C2S>(Identifier.of("emi:chess_c2s"));
 
     public static void init(RegisterPayloadHandlersEvent event) {
         var registrar = event.registrar("emi").optional();
